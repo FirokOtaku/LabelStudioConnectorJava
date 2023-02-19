@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import okhttp3.*;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.Map;
@@ -11,7 +12,7 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 
 abstract sealed class InnerClient
-		permits AnnotationsClient, ProjectsClient, UsersClient
+		permits AnnotationsClient, DataManagerClient, ImportClient, ProjectsClient, UsersClient
 {
 	protected final LabelStudioConnector conn;
 	protected InnerClient(LabelStudioConnector conn)
@@ -133,6 +134,19 @@ abstract sealed class InnerClient
 					return request.post(requestBody);
 				},
 				(response, om) -> response
+		);
+	}
+	protected <TypeBean> TypeBean postFiles(String path, Map<String, File> files, TypeReference<TypeBean> beanType, int code)
+	{
+		return handle(
+				path, true, code,
+				(request, om) -> {
+					var requestBody = new MultipartBody.Builder()
+							// todo
+							.build();
+					return request.post(requestBody);
+				},
+				(response, om) -> om.readValue(response.body().byteStream(), beanType)
 		);
 	}
 
