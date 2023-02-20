@@ -5,15 +5,16 @@ import firok.tool.labelstudio.util.TypeUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.InputStream;
+
 import static firok.tool.labelstudio.util.HttpUtils.mapOf;
-import static firok.tool.labelstudio.util.TypeUtils.StringArrayType;
-import static firok.tool.labelstudio.util.TypeUtils.StringType;
+import static firok.tool.labelstudio.util.TypeUtils.*;
 
 public final class ExportClient extends InnerClient
 {
 	ExportClient(LabelStudioConnector conn) { super(conn); }
 
-	public String exportTaskAndAnnotations(
+	public byte[] exportTaskAndAnnotations(
 			long projectId,
 			@Nullable String exportType,
 			@Nullable Boolean downloadAllTasks,
@@ -26,7 +27,22 @@ public final class ExportClient extends InnerClient
 				"download_all_tasks", downloadAllTasks,
 				"download_resources", downloadResources,
 				"ids[]", taskIds
-		), StringType, 200);
+		), ByteArrayType, 200);
+	}
+	public InputStream exportTaskAndAnnotationsStream(
+			long projectId,
+			@Nullable String exportType,
+			@Nullable Boolean downloadAllTasks,
+			@Nullable Boolean downloadResources,
+			@Nullable String[] taskIds
+	)
+	{
+		return get("/api/projects/" + projectId + "/export", mapOf(
+				"export_type", exportType,
+				"download_all_tasks", downloadAllTasks,
+				"download_resources", downloadResources,
+				"ids[]", taskIds
+		), InputStreamType, 200);
 	}
 
 	public String[] getExportFormats(long projectId)

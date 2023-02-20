@@ -5,8 +5,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import okhttp3.*;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.*;
 
+@SuppressWarnings({"unchecked", "DataFlowIssue"})
 abstract sealed class InnerClient
 		permits AnnotationsClient, DataManagerClient, ExportClient, ImportClient, ProjectsClient, UsersClient
 {
@@ -22,7 +24,20 @@ abstract sealed class InnerClient
 	@FunctionalInterface
 	private interface ResponseFunction<TypeBean> { TypeBean apply(Response response, ObjectMapper om) throws Exception; }
 
-	<TypeBean> TypeBean handle(HttpUrl url, boolean json, int code,
+	private static <TypeBean> TypeBean handleResponse(Response response, ObjectMapper om, TypeReference<TypeBean> beanType) throws IOException
+	{
+		return switch (beanType.getType().getTypeName())
+		{
+			case "java.io.InputStream" -> (TypeBean) response.body().byteStream();
+			case "byte[]" -> (TypeBean) response.body().bytes();
+			default -> {
+				if(om == null) throw new IOException("No json mapper provided");
+				yield om.readValue(response.body().byteStream(), beanType);
+			}
+		};
+	}
+
+	private <TypeBean> TypeBean handle(HttpUrl url, boolean json, int code,
 	                           RequestFunction functionRequest,
 	                           ResponseFunction<TypeBean> functionResponse
 	) throws RequestException
@@ -48,7 +63,7 @@ abstract sealed class InnerClient
 			throw new RequestException(request, response, any);
 		}
 	}
-	<TypeBean> TypeBean handle(String path, boolean json, int code,
+	private <TypeBean> TypeBean handle(String path, boolean json, int code,
 	                       RequestFunction functionRequest,
                            ResponseFunction<TypeBean> functionResponse
 	) throws RequestException
@@ -62,7 +77,7 @@ abstract sealed class InnerClient
 		return handle(
 				path, true, code,
 				(request, om) -> request.get(),
-				(response, om) -> om.readValue(response.body().byteStream(), beanType)
+				(response, om) -> handleResponse(response, om, beanType)
 		);
 	}
 	protected <TypeBean> TypeBean get(String path, Map<String, Object> params, TypeReference<TypeBean> beanType, int code)
@@ -92,14 +107,7 @@ abstract sealed class InnerClient
 		return handle(
 				url, true, code,
 				(request, om) -> request.get(),
-//				(response, om) -> om.readValue(response.body().byteStream(), beanType)
-				(response, om) -> {
-					var body = response.body().string();
-					System.out.println(body);
-					var ret = om.readValue(body, beanType);
-					System.out.println(ret);
-					return ret;
-				}
+				(response, om) -> handleResponse(response, om, beanType)
 		);
 	}
 
@@ -123,7 +131,7 @@ abstract sealed class InnerClient
 					}
 					return request.post(requestBody);
 				},
-				(response, om) -> om.readValue(response.body().byteStream(), beanType)
+				(response, om) -> handleResponse(response, om, beanType)
 		);
 	}
 	protected Response postJson(String path, Object body, int code)
@@ -156,7 +164,7 @@ abstract sealed class InnerClient
 							.build();
 					return request.post(requestBody);
 				},
-				(response, om) -> om.readValue(response.body().byteStream(), beanType)
+				(response, om) -> handleResponse(response, om, beanType)
 		);
 	}
 
@@ -169,7 +177,7 @@ abstract sealed class InnerClient
 					var requestBody = RequestBody.create(bodyJson, TypeJson);
 					return request.patch(requestBody);
 				},
-				(response, om) -> om.readValue(response.body().byteStream(), beanType)
+				(response, om) -> handleResponse(response, om, beanType)
 		);
 	}
 
