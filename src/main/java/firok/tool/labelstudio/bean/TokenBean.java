@@ -3,7 +3,7 @@ package firok.tool.labelstudio.bean;
 import lombok.Data;
 
 @Data
-public class Token
+public class TokenBean
 {
-	String token;
+	private String token;
 }

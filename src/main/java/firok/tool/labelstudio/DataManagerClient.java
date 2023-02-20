@@ -2,7 +2,7 @@ package firok.tool.labelstudio;
 
 import firok.tool.labelstudio.bean.ActionBean;
 
-import java.util.List;
+import java.util.*;
 
 /**
  * @deprecated 官方文档不全, 这个不做了
@@ -15,7 +15,7 @@ final class DataManagerClient extends InnerClient
 
 	public List<ActionBean> getActions()
 	{
-		return get("/api/dm/actions", anyway(), 200);
+		return get("/api/dm/actions", null, 200);
 	}
 
 	public void performAction()

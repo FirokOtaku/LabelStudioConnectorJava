@@ -3,7 +3,7 @@ package firok.tool.labelstudio.bean;
 import lombok.Data;
 
 @Data
-public class LabelConfig
+public class LabelConfigBean
 {
 	private String labelConfig;
 }

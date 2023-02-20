@@ -1,28 +1,18 @@
 package firok.tool.labelstudio;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
-import firok.tool.labelstudio.bean.AnnotationBean;
-import firok.tool.labelstudio.bean.Page;
-import firok.tool.labelstudio.bean.ProjectBean;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
-import org.jetbrains.annotations.NotNull;
 
-import java.io.IOException;
-import java.io.Serializable;
 import java.net.URL;
-import java.util.*;
-
-import static firok.tool.labelstudio.util.HttpUtils.mapOf;
 
 public class LabelStudioConnector
 {
+	@Deprecated(forRemoval = true)
+	public static final String VERSION = "0.4.0";
+
 	final HttpUrl host;
 	String token;
 	final OkHttpClient client;
@@ -32,8 +22,11 @@ public class LabelStudioConnector
 		return omTemplate.copy();
 	}
 
+	public final UsersClient Users;
 	public final ProjectsClient Projects;
 	public final AnnotationsClient Annotations;
+	public final ImportClient Import;
+	public final ExportClient Export;
 
 
 	public LabelStudioConnector(URL host, String token)
@@ -48,5 +41,8 @@ public class LabelStudioConnector
 
 		this.Projects = new ProjectsClient(this);
 		this.Annotations = new AnnotationsClient(this);
+		this.Import = new ImportClient(this);
+		this.Export = new ExportClient(this);
+		this.Users = new UsersClient(this);
 	}
 }

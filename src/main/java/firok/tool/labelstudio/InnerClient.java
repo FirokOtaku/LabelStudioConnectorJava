@@ -5,14 +5,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import okhttp3.*;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.Serializable;
-import java.util.Map;
-import java.util.function.BiFunction;
-import java.util.function.Function;
+import java.util.*;
 
 abstract sealed class InnerClient
-		permits AnnotationsClient, DataManagerClient, ImportClient, ProjectsClient, UsersClient
+		permits AnnotationsClient, DataManagerClient, ExportClient, ImportClient, ProjectsClient, UsersClient
 {
 	protected final LabelStudioConnector conn;
 	protected InnerClient(LabelStudioConnector conn)
@@ -69,7 +65,7 @@ abstract sealed class InnerClient
 				(response, om) -> om.readValue(response.body().byteStream(), beanType)
 		);
 	}
-	protected <TypeBean> TypeBean get(String path, Map<String, Serializable> params, TypeReference<TypeBean> beanType, int code)
+	protected <TypeBean> TypeBean get(String path, Map<String, Object> params, TypeReference<TypeBean> beanType, int code)
 	{
 		var url = switch (params.isEmpty() ? 1 : 0) {
 			case 1 -> conn.host.resolve(path);
@@ -79,8 +75,15 @@ abstract sealed class InnerClient
 				{
 					var key = entry.getKey();
 					var value = entry.getValue();
-					if(value == null) continue;
-					urlBuilder.addQueryParameter(key, String.valueOf(value));
+					if(value instanceof Object[] arr)
+					{
+						for(var obj : arr)
+							urlBuilder.addQueryParameter(key, String.valueOf(obj));
+					}
+					else if(value != null)
+					{
+						urlBuilder.addQueryParameter(key, String.valueOf(value));
+					}
 				}
 				yield urlBuilder.build();
 			}
@@ -89,7 +92,14 @@ abstract sealed class InnerClient
 		return handle(
 				url, true, code,
 				(request, om) -> request.get(),
-				(response, om) -> om.readValue(response.body().byteStream(), beanType)
+//				(response, om) -> om.readValue(response.body().byteStream(), beanType)
+				(response, om) -> {
+					var body = response.body().string();
+					System.out.println(body);
+					var ret = om.readValue(body, beanType);
+					System.out.println(ret);
+					return ret;
+				}
 		);
 	}
 
@@ -174,6 +184,4 @@ abstract sealed class InnerClient
 				}
 		);
 	}
-
-	protected static <TypeBean> TypeReference<TypeBean> anyway() { return new TypeReference<>() { }; }
 }

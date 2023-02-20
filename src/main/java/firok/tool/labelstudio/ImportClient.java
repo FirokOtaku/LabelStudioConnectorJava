@@ -5,9 +5,7 @@ import firok.tool.labelstudio.bean.FileBean;
 
 import java.io.File;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public final class ImportClient extends InnerClient
 {
@@ -15,12 +13,12 @@ public final class ImportClient extends InnerClient
 
 	public FileBean getFile(long fileId)
 	{
-		return get("/api/import/file-upload/" + fileId, anyway(), 200);
+		return get("/api/import/file-upload/" + fileId, FileBean.Type, 200);
 	}
 
 	public FileBean updateFile(long fileId)
 	{
-		return patchJson200("/api/import/file-upload/" + fileId, new HashMap<>(), anyway());
+		return patchJson200("/api/import/file-upload/" + fileId, new HashMap<>(), FileBean.Type);
 	}
 
 	public void deleteFile(long fileId)
@@ -28,9 +26,9 @@ public final class ImportClient extends InnerClient
 		delete204("/api/import/file-upload/" + fileId);
 	}
 
-	public List<FileBean> getProjectFiles(long projectId)
+	public FileBean[] getProjectFiles(long projectId)
 	{
-		return get("/api/projects/" + projectId + "/file-uploads", anyway(), 200);
+		return get("/api/projects/" + projectId + "/file-uploads", FileBean.ArrayType, 200);
 	}
 
 	public void deleteProjectFiles(long projectId)

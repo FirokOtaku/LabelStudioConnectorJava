@@ -8,5 +8,5 @@ public class Page<TypeBean>
 	private Long count;
 	private String next;
 	private String previous;
-	private TypeBean results;
+	private TypeBean[] results;
 }
