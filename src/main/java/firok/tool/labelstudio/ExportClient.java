@@ -57,7 +57,7 @@ public final class ExportClient extends InnerClient
 
 	public SnapshotBean createNewExportSnapshot(long projectId, SnapshotBean snapshot)
 	{
-		return postJson("/api/projects/" + projectId + "/exports", snapshot, SnapshotBean.Type, 201);
+		return postJson201("/api/projects/" + projectId + "/exports", snapshot, SnapshotBean.Type);
 	}
 
 	public SnapshotBean getExportSnapshot(long projectId, @NotNull String exportPrimaryKey)

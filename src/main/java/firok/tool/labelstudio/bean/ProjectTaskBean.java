@@ -10,6 +10,7 @@ import java.util.*;
 @Data
 public class ProjectTaskBean
 {
+	public static final TypeReference<ProjectTaskBean> Type = new TypeReference<>() { };
 	public static final TypeReference<Page<ProjectTaskBean>> PageType = new TypeReference<>() { };
 	public static final TypeReference<ProjectTaskBean[]> ArrayType = new TypeReference<>() { };
 
@@ -30,7 +31,7 @@ public class ProjectTaskBean
 	private Long project;
 	private Long updatedBy;
 	private Long fileUpload;
-	private ArrayNode commentAuthors;
+	private List<Long> commentAuthors;
 	private List<AnnotationBean> annotations;
 	private ArrayNode predictions;
 }

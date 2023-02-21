@@ -11,7 +11,7 @@ import java.net.URL;
 public class LabelStudioConnector
 {
 	@Deprecated(forRemoval = true)
-	public static final String VERSION = "0.5.0";
+	public static final String VERSION = "0.6.0";
 
 	final HttpUrl host;
 	String token;
@@ -27,6 +27,10 @@ public class LabelStudioConnector
 	public final AnnotationsClient Annotations;
 	public final ImportClient Import;
 	public final ExportClient Export;
+	public final TasksClient Tasks;
+	final DirectClient Direct;
+
+	public final AdvancedExportClient AdvancedExport;
 
 
 	public LabelStudioConnector(URL host, String token)
@@ -44,5 +48,10 @@ public class LabelStudioConnector
 		this.Import = new ImportClient(this);
 		this.Export = new ExportClient(this);
 		this.Users = new UsersClient(this);
+		this.Tasks = new TasksClient(this);
+
+		this.Direct = new DirectClient(this);
+
+		this.AdvancedExport = new AdvancedExportClient(this);
 	}
 }

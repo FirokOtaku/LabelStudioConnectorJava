@@ -29,7 +29,7 @@ public final class ProjectsClient extends InnerClient
 
 	public ProjectBean createProject(ProjectBean project)
 	{
-		return postJson("/api/projects", project, ProjectBean.Type, 201);
+		return postJson201("/api/projects", project, ProjectBean.Type);
 	}
 
 	public void validateLabelConfig(@NotNull String labelConfig)

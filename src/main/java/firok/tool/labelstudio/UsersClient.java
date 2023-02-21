@@ -13,7 +13,7 @@ public final class UsersClient extends InnerClient
 	 * */
 	public String resetUserToken()
 	{
-		var token = postJson("/api/current-user/reset-token", null, StringType, 201);
+		var token = postJson201("/api/current-user/reset-token", null, StringType);
 		return conn.token = "Token " + token;
 	}
 
@@ -34,7 +34,7 @@ public final class UsersClient extends InnerClient
 
 	public UserBean createUser(UserBean user)
 	{
-		return postJson("/api/users", user, UserBean.Type, 201);
+		return postJson201("/api/users", user, UserBean.Type);
 	}
 
 	public UserBean getUserInfo(long userId)

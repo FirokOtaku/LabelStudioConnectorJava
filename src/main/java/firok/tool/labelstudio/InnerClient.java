@@ -10,7 +10,7 @@ import java.util.*;
 
 @SuppressWarnings({"unchecked", "DataFlowIssue"})
 abstract sealed class InnerClient
-		permits AnnotationsClient, DataManagerClient, ExportClient, ImportClient, ProjectsClient, UsersClient
+		permits AdvancedExportClient, AnnotationsClient, DataManagerClient, DirectClient, ExportClient, ImportClient, ProjectsClient, TasksClient, UsersClient
 {
 	protected final LabelStudioConnector conn;
 	protected InnerClient(LabelStudioConnector conn)
@@ -30,9 +30,13 @@ abstract sealed class InnerClient
 		{
 			case "java.io.InputStream" -> (TypeBean) response.body().byteStream();
 			case "byte[]" -> (TypeBean) response.body().bytes();
+			case "okhttp3.Response" -> (TypeBean) response;
 			default -> {
 				if(om == null) throw new IOException("No json mapper provided");
 				yield om.readValue(response.body().byteStream(), beanType);
+//				var bodyContent = response.body().string();
+//				System.out.println("原始数据: \n" + bodyContent);
+//				yield om.readValue(bodyContent, beanType);
 			}
 		};
 	}
@@ -114,10 +118,10 @@ abstract sealed class InnerClient
 	private static final MediaType TypeJson = MediaType.parse("application/json");
 	private static final MediaType TypeEmpty = MediaType.parse("");
 
-	protected <TypeBean> TypeBean postJson(String path, Object body, TypeReference<TypeBean> beanType, int code)
+	protected <TypeBean> TypeBean postJson201(String path, Object body, TypeReference<TypeBean> beanType)
 	{
 		return handle(
-				path, true, code,
+				path, true, 201,
 				(request, om) -> {
 					RequestBody requestBody;
 					if(body == null)
@@ -134,9 +138,9 @@ abstract sealed class InnerClient
 				(response, om) -> handleResponse(response, om, beanType)
 		);
 	}
-	protected Response postJson(String path, Object body, int code)
+	protected void postJson(String path, Object body, int code)
 	{
-		return handle(
+		handle(
 				path, true, code,
 				(request, om) -> {
 					RequestBody requestBody;
@@ -181,9 +185,9 @@ abstract sealed class InnerClient
 		);
 	}
 
-	protected Object delete204(String path)
+	protected void delete204(String path)
 	{
-		return handle(
+		handle(
 				path, false, Integer.MIN_VALUE,
 				(request, om) -> request.delete(),
 				(response, om) -> {

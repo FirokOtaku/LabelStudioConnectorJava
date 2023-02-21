@@ -29,6 +29,6 @@ public final class AnnotationsClient extends InnerClient
 
 	public AnnotationBean createAnnotation(long taskId, AnnotationBean annotation)
 	{
-		return postJson("/api/tasks/" + taskId + "/annotations", annotation, AnnotationBean.Type, 201);
+		return postJson201("/api/tasks/" + taskId + "/annotations", annotation, AnnotationBean.Type);
 	}
 }
