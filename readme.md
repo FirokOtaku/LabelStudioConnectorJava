@@ -18,7 +18,7 @@ maven
 <dependencies>
     <dependency>
         <groupId>firok.tool</groupId>
-        <artifactId>labelstudio-sdk</artifactId>
+        <artifactId>labelstudio-connector</artifactId>
         <version>{VERSION}</version>
     </dependency>
 </dependencies>
