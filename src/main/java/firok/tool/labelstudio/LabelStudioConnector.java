@@ -3,6 +3,7 @@ package firok.tool.labelstudio;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import firok.topaz.general.Version;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 
@@ -10,8 +11,7 @@ import java.net.URL;
 
 public class LabelStudioConnector
 {
-	@Deprecated(forRemoval = true)
-	public static final String VERSION = "0.6.0";
+	public static final Version Version = new Version(0, 7, 0);
 
 	final HttpUrl host;
 	String token;
@@ -31,7 +31,6 @@ public class LabelStudioConnector
 	final DirectClient Direct;
 
 	public final AdvancedExportClient AdvancedExport;
-
 
 	public LabelStudioConnector(URL host, String token)
 	{
