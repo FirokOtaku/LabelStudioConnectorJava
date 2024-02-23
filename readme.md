@@ -24,7 +24,7 @@ maven
 </dependencies>
 ```
 
-Java 17
+Java 21
 
 ```java
 var conn = new firok.tool.labelstudio.LabelStudioConnector("http://localhost:8080", "token123");
@@ -33,6 +33,8 @@ System.out.println(users);
 ```
 
 ----
+
+API coverage:
 
 * Annotations
   * --
@@ -48,3 +50,7 @@ System.out.println(users);
   * --
 * Advanced Export
   * export full COCO dataset
+
+----
+
+基于 [木兰宽松许可证 (第2版)](license) 协议开源

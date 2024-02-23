@@ -8,6 +8,10 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.util.HashSet;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.zip.ZipFile;
 
 public final class AdvancedExportClient extends InnerClient
@@ -75,17 +79,57 @@ public final class AdvancedExportClient extends InnerClient
 			System.out.println("获取任务信息 读取真实图片路径");
 			var projectTasks = conn.Tasks.getTasksList(projectId, null).getTasks();
 
-			for(var task : projectTasks)
+			var setDownloaded = new HashSet<String>();
+			var threadObserver = new Thread(() -> {
+				while (true)
+				{
+					System.out.println("已下载 " + setDownloaded.size() + " 张图片");
+					try { Thread.sleep(5000); } catch (InterruptedException e) { break; }
+				}
+			});
+			threadObserver.setDaemon(true);
+			try
 			{
-				var imageUrlUrl = task.getData().get("image").textValue();
-				var imageUrlReal = URLDecoder.decode(imageUrlUrl, StandardCharsets.UTF_8);
-				var imageFilename = new File(imageUrlReal).getName();
-				var imageFile = new File(folderImages, imageFilename);
-				try(
-						var isImage = conn.Direct.requestStream(imageUrlReal);
-						var osImage = new FileOutputStream(imageFile)
-				) { isImage.transferTo(osImage); }
-				System.out.println("下载图片成功: " + imageFilename);
+				threadObserver.start();
+				var pool = Executors.newFixedThreadPool(
+						Runtime.getRuntime().availableProcessors() * 2
+				);
+				for(var task : projectTasks)
+				{
+					pool.submit(() -> {
+						try
+						{
+							var imageUrlUrl = task.getData().get("image").textValue();
+							var imageUrlReal = URLDecoder.decode(imageUrlUrl, StandardCharsets.UTF_8);
+							var imageFilename = new File(imageUrlReal).getName();
+							var imageFile = new File(folderImages, imageFilename);
+							try(
+									var isImage = conn.Direct.requestStream(imageUrlReal);
+									var osImage = new FileOutputStream(imageFile)
+							) { isImage.transferTo(osImage); }
+							synchronized (setDownloaded)
+							{
+								setDownloaded.add(imageFilename);
+							}
+						}
+						catch (Exception any)
+						{
+							throw new RuntimeException(any);
+						}
+					});
+				}
+				pool.shutdown();
+				var result = pool.awaitTermination(projectTasks.size() * 10L, TimeUnit.SECONDS);
+				if(!result) throw new TimeoutException();
+				System.out.println("成功下载 " + setDownloaded.size() + " 张图片");
+			}
+			catch (Exception any)
+			{
+				throw new RuntimeException(any);
+			}
+			finally
+			{
+				threadObserver.interrupt();
 			}
 
 			om.writeValue(fileCocoJson, cocoJson);

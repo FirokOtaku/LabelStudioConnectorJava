@@ -12,7 +12,7 @@ import java.net.URL;
 public class LabelStudioConnector
 {
 	public static final String Name = "Label Studio Connector Java";
-	public static final Version Version = new Version(0, 8, 0);
+	public static final Version Version = new Version(0, 9, 0);
 
 	final HttpUrl host;
 	String token;
