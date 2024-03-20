@@ -3,16 +3,30 @@ package firok.tool.labelstudio;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import firok.topaz.general.ProgramMeta;
 import firok.topaz.general.Version;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 
 import java.net.URL;
+import java.util.List;
 
 public class LabelStudioConnector
 {
-	public static final String Name = "Label Studio Connector Java";
-	public static final Version Version = new Version(0, 9, 0);
+	public static final ProgramMeta META = new ProgramMeta(
+			"firok.tool.labelstudioconnector",
+			"Label Studio Connector Java",
+			new Version(0, 10, 0),
+			"",
+			List.of("Firok"),
+			List.of("https://github.com/FirokOtaku/LabelStudioConnectorJava"),
+			List.of("https://github.com/FirokOtaku/LabelStudioConnectorJava"),
+			"Mulan PSL v2"
+	);
+	@Deprecated(forRemoval = true)
+	public static final String Name = META.name;
+	@Deprecated(forRemoval = true)
+	public static final Version Version = META.version;
 
 	final HttpUrl host;
 	String token;
