@@ -59,7 +59,15 @@ abstract sealed class InnerClient
 			).build();
 			response = conn.client.newCall(request).execute();
 			if(code != Integer.MIN_VALUE && code != response.code())
-				throw new IllegalStateException();
+			{
+				String str = null;
+				try(var is = response.body().byteStream())
+				{
+					str = new String(is.readAllBytes());
+				}
+				catch (Exception _){ }
+				throw new IllegalStateException(str);
+			}
 			return functionResponse.apply(response, om);
 		}
 		catch (Exception any)

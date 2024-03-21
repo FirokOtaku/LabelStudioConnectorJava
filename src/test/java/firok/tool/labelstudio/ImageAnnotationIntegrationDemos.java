@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import firok.tool.labelstudio.bean.AnnotationBean;
 import org.junit.jupiter.api.Test;
 
+import java.util.UUID;
+
 import static firok.topaz.general.Collections.sizeOf;
 
 /**
@@ -12,7 +14,7 @@ import static firok.topaz.general.Collections.sizeOf;
 @SuppressWarnings({"NewClassNamingConvention"})
 public class ImageAnnotationIntegrationDemos
 {
-//    @Test
+    @Test
     void testQueryTaskDetail()
     {
         var conn = RemoteServerInfo.Conn;
@@ -33,7 +35,7 @@ public class ImageAnnotationIntegrationDemos
         }
     }
 
-//    @Test
+    @Test
     void testCreateAnnotation() throws Exception
     {
         var conn = RemoteServerInfo.Conn;
@@ -41,19 +43,19 @@ public class ImageAnnotationIntegrationDemos
         var result = om.readTree("""
                 [
                   {
-                    "original_width": 440,
-                    "original_height": 237,
+                    "original_width": 490,
+                    "original_height": 253,
                     "image_rotation": 0,
                     "value": {
                       "points": [
-                        [25.643507972665148, 87.01594533029613],
-                        [48.5876993166287, 67.88154897494306],
-                        [53.372851522054255, 91.79954441913439]
+                        [20, 80],
+                        [50, 100],
+                        [55, 100]
                       ],
                       "closed": true,
                       "polygonlabels": ["干净"]
                     },
-                    "id": "LrdPBd3RiH",
+                    "id": "1048e39752",
                     "from_name": "label",
                     "to_name": "image",
                     "type": "polygonlabels",
@@ -63,10 +65,13 @@ public class ImageAnnotationIntegrationDemos
                 """);
 
         var anno = new AnnotationBean();
-        anno.setProject(1617L);
+        anno.setTask(1617L);
+        anno.setProject(14L);
         anno.setGroundTruth(false);
         anno.setWasCancelled(false);
         anno.setResult(result);
+        anno.setCompletedBy(4L);
+        anno.setUniqueId(UUID.randomUUID().toString());
         conn.Annotations.createAnnotation(1617L, anno);
 
     }
