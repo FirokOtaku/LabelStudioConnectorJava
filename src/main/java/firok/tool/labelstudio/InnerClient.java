@@ -6,6 +6,7 @@ import okhttp3.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 @SuppressWarnings({"unchecked", "DataFlowIssue"})
@@ -33,7 +34,17 @@ abstract sealed class InnerClient
 			case "okhttp3.Response" -> (TypeBean) response;
 			default -> {
 				if(om == null) throw new IOException("No json mapper provided");
-				yield om.readValue(response.body().byteStream(), beanType);
+				var buffer = response.body().byteStream().readAllBytes();
+				var str = new String(buffer, StandardCharsets.UTF_8);
+				try
+				{
+					yield om.readValue(str, beanType);
+				}
+				catch (Throwable any)
+				{
+					System.err.println("将内容转换为 " + beanType.getType() + " 类型时发生错误\n" + str);
+					throw any;
+				}
 //				var bodyContent = response.body().string();
 //				System.out.println("原始数据: \n" + bodyContent);
 //				yield om.readValue(bodyContent, beanType);

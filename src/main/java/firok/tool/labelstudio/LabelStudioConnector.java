@@ -16,7 +16,7 @@ public class LabelStudioConnector
 	public static final ProgramMeta META = new ProgramMeta(
 			"firok.tool.labelstudioconnector",
 			"Label Studio Connector Java",
-			new Version(0, 10, 0),
+			new Version(0, 11, 0),
 			"",
 			List.of("Firok"),
 			List.of("https://github.com/FirokOtaku/LabelStudioConnectorJava"),
@@ -43,7 +43,11 @@ public class LabelStudioConnector
 	public final ImportClient Import;
 	public final ExportClient Export;
 	public final TasksClient Tasks;
-	final DirectClient Direct;
+	/**
+	 * Give u direct access to the Label Studio API to get image file or something.
+	 * @since 0.11.0
+	 * */
+	public final DirectClient Direct;
 
 	public final AdvancedExportClient AdvancedExport;
 
