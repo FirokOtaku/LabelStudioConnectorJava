@@ -1,10 +1,10 @@
 # Label Studio Connector Java
 
 ⚠ 这只是一个个人用途的封装, **不是 Label Studio 官方的 SDK**.
-不包含官方所有 API 功能, 已实现接口也没有进行测试.
+不包含官方所有 API 功能, 已实现接口也没有完整进行测试.
 
 ⚠ This is for personal usage and **NOT official SDK of Label Studio**.
-NOT all Label Studio APIs are included. Existing interfaces are NOT tested.
+NOT all Label Studio APIs are included. Existing interfaces are NOT well tested.
 
 * [Label Studio](https://labelstud.io/)
 * [Label Studio API docs](https://labelstud.io/api)

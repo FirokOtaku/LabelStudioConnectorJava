@@ -16,7 +16,7 @@ public class LabelStudioConnector
 	public static final ProgramMeta META = new ProgramMeta(
 			"firok.tool.labelstudioconnector",
 			"Label Studio Connector Java",
-			new Version(0, 11, 0),
+			new Version(0, 12, 0),
 			"",
 			List.of("Firok"),
 			List.of("https://github.com/FirokOtaku/LabelStudioConnectorJava"),
