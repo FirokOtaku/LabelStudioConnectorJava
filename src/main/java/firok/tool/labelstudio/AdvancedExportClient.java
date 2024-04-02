@@ -3,12 +3,17 @@ package firok.tool.labelstudio;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import firok.tool.labelstudio.bean.TaskListBean;
+import firok.tool.labelstudio.bean.TaskListTaskBean;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
+import java.util.Set;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -96,30 +101,10 @@ public final class AdvancedExportClient extends InnerClient
 				);
 				for(var task : projectTasks)
 				{
-					pool.submit(() -> {
-						try
-						{
-							var imageUrlUrl = task.getData().get("image").textValue();
-							var imageUrlReal = URLDecoder.decode(imageUrlUrl, StandardCharsets.UTF_8);
-							var imageFilename = new File(imageUrlReal).getName();
-							var imageFile = new File(folderImages, imageFilename);
-							try(
-									var isImage = conn.Direct.requestStream(imageUrlReal);
-									var osImage = new FileOutputStream(imageFile)
-							) { isImage.transferTo(osImage); }
-							synchronized (setDownloaded)
-							{
-								setDownloaded.add(imageFilename);
-							}
-						}
-						catch (Exception any)
-						{
-							throw new RuntimeException(any);
-						}
-					});
+					pool.submit(downloadTaskImage(pool, task, folderImages, setDownloaded));
 				}
 				pool.shutdown();
-				var result = pool.awaitTermination(projectTasks.size() * 10L, TimeUnit.SECONDS);
+				var result = pool.awaitTermination(projectTasks.size() * 60L, TimeUnit.SECONDS);
 				if(!result) throw new TimeoutException();
 				System.out.println("成功下载 " + setDownloaded.size() + " 张图片");
 			}
@@ -144,5 +129,42 @@ public final class AdvancedExportClient extends InnerClient
 		{
 			System.out.println("导出完成");
 		}
+	}
+
+	private Runnable downloadTaskImage(ExecutorService pool, TaskListTaskBean task, File folderImages, Set<String> setDownloaded)
+	{
+		return () -> {
+			for(var retryCount = 0; retryCount <= 10; retryCount++)
+			{
+				String imageUrlReal = null;
+				try
+				{
+					var imageUrlUrl = task.getData().get("image").textValue();
+					imageUrlReal = URLDecoder.decode(imageUrlUrl, StandardCharsets.UTF_8);
+					var imageFilename = new File(imageUrlReal).getName();
+					var imageFile = new File(folderImages, imageFilename);
+					try(
+							var isImage = conn.Direct.requestStream(imageUrlReal);
+							var osImage = new FileOutputStream(imageFile) // OutputStream.nullOutputStream() //
+					)
+					{
+						isImage.transferTo(osImage);
+						osImage.flush();
+					}
+
+					synchronized (setDownloaded)
+					{
+						setDownloaded.add(imageFilename);
+					}
+
+					return;
+				}
+				catch (Exception any)
+				{
+					System.err.println("下载图片出现错误 任务 [" + task.getId() + "] 重试 [" + retryCount + "] 路径 [" + imageUrlReal + "] " + any.getLocalizedMessage());
+				}
+			}
+			System.err.println("重试次数过多, 放弃下载 任务 [" + task.getId() + "]");
+		};
 	}
 }

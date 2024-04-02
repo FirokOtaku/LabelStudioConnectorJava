@@ -9,6 +9,7 @@ import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 
 import java.net.URL;
+import java.time.Duration;
 import java.util.List;
 
 public class LabelStudioConnector
@@ -16,7 +17,7 @@ public class LabelStudioConnector
 	public static final ProgramMeta META = new ProgramMeta(
 			"firok.tool.labelstudioconnector",
 			"Label Studio Connector Java",
-			new Version(0, 12, 0),
+			new Version(0, 13, 0),
 			"",
 			List.of("Firok"),
 			List.of("https://github.com/FirokOtaku/LabelStudioConnectorJava"),
@@ -53,7 +54,12 @@ public class LabelStudioConnector
 
 	public LabelStudioConnector(URL host, String token)
 	{
+		var d10m = Duration.ofMinutes(10);
 		this.client = new OkHttpClient.Builder()
+				.callTimeout(d10m)
+				.writeTimeout(d10m)
+				.writeTimeout(d10m)
+				.connectTimeout(d10m)
 				.build();
 		this.host = HttpUrl.get(host);
 		this.token = "Token " + token;
