@@ -32,6 +32,12 @@ var users = conn.Users.listUsers();
 System.out.println(users);
 ```
 
+> LabelStudioConnector 用到了另一个个人库 [Topaz](https://github.com/FirokOtaku/Topaz),
+> 请查看对应文档以配置依赖.
+> 
+> LabelStudioConnector depends on [Topaz](https://github.com/FirokOtaku/Topaz).
+> Please check the docs for dependency management.
+
 ----
 
 API coverage:
@@ -54,3 +60,5 @@ API coverage:
 ----
 
 基于 [木兰宽松许可证 (第2版)](license) 协议开源
+
+Open source under the [Mulan PSL v2](license).
